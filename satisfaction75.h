@@ -58,8 +58,8 @@ enum custom_encoder_behavior {
 
 enum oled_modes {
     OLED_DEFAULT,
-    OLED_BONGO,
     OLED_PETS,
+    OLED_BONGO,
     OLED_OFF,
     _NUM_OLED_MODES
 };
