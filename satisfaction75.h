@@ -128,3 +128,6 @@ void breathing_enable(void);
 void breathing_disable(void);
 void custom_config_load(void);
 void backlight_config_save(void);
+
+// frames
+void write_luna_jump(void);
