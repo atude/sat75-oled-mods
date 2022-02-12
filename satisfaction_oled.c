@@ -466,9 +466,9 @@ bool oled_task_kb(void) {
     switch (oled_mode) {
         default:
         case OLED_DEFAULT:
-            // oled_clear();
-            // draw_matrix();
-            draw_community_camping();
+            oled_clear();
+            draw_matrix();
+            // draw_community_camping();
             break;
         case OLED_PETS:
             draw_current_pet();
