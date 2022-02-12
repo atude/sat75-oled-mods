@@ -23,7 +23,6 @@ uint8_t layer;
 
 bool clock_set_mode = false;
 uint8_t oled_mode = OLED_DEFAULT;
-uint8_t pet_mode = PET_LUNA;
 bool oled_repaint_requested = false;
 bool oled_wakeup_requested = false;
 uint32_t oled_sleep_timer;

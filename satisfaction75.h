@@ -58,16 +58,8 @@ enum custom_encoder_behavior {
 
 enum oled_modes {
     OLED_DEFAULT,
-    OLED_PETS,
-    OLED_BONGO,
     OLED_OFF,
     _NUM_OLED_MODES
-};
-
-enum pet_modes {
-    PET_LUNA,
-    PET_KIRBY,
-    _NUM_PET_MODES,
 };
 
 // Keyboard Information
@@ -78,7 +70,6 @@ extern uint8_t layer;
 
 // OLED Behavior
 extern uint8_t oled_mode;
-extern uint8_t pet_mode;
 extern bool oled_repaint_requested;
 extern bool oled_wakeup_requested;
 extern uint32_t oled_sleep_timer;
