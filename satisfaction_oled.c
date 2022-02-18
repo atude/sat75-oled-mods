@@ -420,9 +420,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     return true;
 }
 
-static char* get_wpm(void) {
-    static char wpm_str[8] = "";
-    sprintf(wpm_str, "%03dwpm", wpm());
+static char* get_wpm_str(void) {
+    static char wpm_str[5] = "";
+		if (wpm() > 0) {
+    	sprintf(wpm_str, "%03d", wpm());
+		} else {
+			sprintf(wpm_str, "wpm");
+		}
     return wpm_str;
 }
 
@@ -805,6 +809,7 @@ void draw_matrix() {
 
 void draw_bongo() {
     led_t led_state = host_keyboard_led_state();
+		uint8_t mod_state = get_mods();
 
     // assumes 1 frame prep stage
     // mode 0 = default, mode 1 = pre idle
@@ -849,19 +854,30 @@ void draw_bongo() {
     }
 
     // Text drawing
-    oled_set_cursor(0, 1);
-    oled_write(get_wpm(), false);
+		oled_set_cursor(0, 1);
+		if (mod_state & MOD_MASK_SHIFT) {
+    	oled_write(get_date(), false);
+		} else {
+    	oled_write(get_time(false), false);
+		}
+
+		// draw_rectangle(108, 6, 20, 11, false);
+		if (biton32(layer_state) > 0) {
+			oled_set_cursor(19, 2);
+			oled_write_P(PSTR("L"), false);
+			oled_write_char(get_highest_layer(layer_state) + 0x30, false);
+		}
+
+		if (led_state.caps_lock) {
+			oled_set_cursor(0, 2);
+			oled_write_P(PSTR("CAPS"), false);
+		}
 
     oled_set_cursor(0, 3);
-    if (encoder_mode != ENC_MODE_VOLUME) {
-        oled_write(get_enc_mode(), false);
-    }
+		oled_write(get_enc_mode(), false);
 
-    oled_set_cursor(19, 3);
-    if (biton32(layer_state) > 0) {
-        oled_write_P(PSTR("L"), false);
-        oled_write_char(get_highest_layer(layer_state) + 0x30, false);
-    }
+    oled_set_cursor(18, 3);
+		oled_write(get_wpm_str(), false);
 }
 
 void draw_luna() {
