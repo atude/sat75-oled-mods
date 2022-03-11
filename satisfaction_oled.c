@@ -519,8 +519,10 @@ static const char PROGMEM kirby_caps_walk[KIRBY_CAPS_WALK_FRAMES][DEFAULT_ANIM_S
 // Generic variables
 uint32_t anim_timer     = 0;
 uint8_t  prev_oled_mode = 0;
+bool     time_date_disabled = false;
 bool     space_pressed  = false;
 bool     showed_jump    = true;
+static char empty_str[1] = "";
 
 // Bongo frames and variables
 uint8_t bongo_current_idle_frame     = 0;
@@ -554,6 +556,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 // showed_jump   = false;
             } else {
                 space_pressed = false;
+            }
+            break;
+        case KC_F22:
+            if (record->event.pressed) {
+               time_date_disabled = !time_date_disabled;
             }
             break;
         case KC_F23:
@@ -633,12 +640,11 @@ bool oled_task_kb(void) {
     switch (oled_mode) {
         default:
         case OLED_DEFAULT:
-            oled_clear();
+						oled_clear();
             draw_matrix();
-            // draw_community_camping();
             break;
         case OLED_BONGO:
-            draw_bongo_dynamic();
+						draw_bongo_dynamic();
             break;
         case OLED_PETS:
             draw_current_pet();
@@ -774,6 +780,9 @@ static char* get_enc_mode(void) {
 }
 
 static char* get_time(bool simplified) {
+    if (time_date_disabled) {
+        return empty_str;
+    }
     uint8_t  hour   = last_minute / 60;
     uint16_t minute = last_minute % 60;
 
@@ -799,6 +808,9 @@ static char* get_time(bool simplified) {
 }
 
 static char* get_date(bool show_full) {
+    if (time_date_disabled) {
+        return empty_str;
+    }
     int16_t year  = last_timespec.year + 1980;
     int8_t  month = last_timespec.month;
     int8_t  day   = last_timespec.day;
@@ -820,16 +832,8 @@ static char* get_date(bool show_full) {
 }
 
 void draw_pet_text_section(void) {
-    uint8_t mod_state = get_mods();
-
-    // Text drawing
-    if (mod_state & MOD_MASK_SHIFT) {
-        oled_set_cursor(13, 1);
-        oled_write(get_date(false), false);
-    } else {
-        oled_set_cursor(14, 1);
-        oled_write(get_time(false), false);
-    }
+		oled_set_cursor(14, 1);
+		oled_write(get_time(false), false);
 
     oled_set_cursor(13, 3);
     oled_write(get_enc_mode(), false);
@@ -950,13 +954,8 @@ void draw_matrix() {
         }
     }
 
-    if (mod_state & MOD_MASK_SHIFT) {
-        oled_set_cursor(13, 1);
-        oled_write(get_date(false), false);
-    } else {
-        oled_set_cursor(14, 1);
-        oled_write(get_time(false), false);
-    }
+		oled_set_cursor(14, 1);
+		oled_write(get_time(false), false);
 
     oled_set_cursor(11, 3);
     if (encoder_mode != ENC_MODE_VOLUME) {
@@ -1056,11 +1055,7 @@ void draw_bongo_dynamic() {
 
     // Text drawing
     oled_set_cursor(0, 1);
-    if (mod_state & MOD_MASK_SHIFT) {
-        oled_write(get_date(false), false);
-    } else {
-        oled_write(get_time(false), false);
-    }
+		oled_write(get_time(false), false);
 
     // draw_rectangle(108, 6, 20, 11, false);
     if (biton32(layer_state) > 0) {
@@ -1086,7 +1081,6 @@ void draw_bongo_dynamic() {
 // old version based on wpm
 void draw_bongo() {
     led_t   led_state = host_keyboard_led_state();
-    uint8_t mod_state = get_mods();
 
     // assumes 1 frame prep stage
     // mode 0 = default, mode 1 = pre idle
@@ -1132,11 +1126,7 @@ void draw_bongo() {
 
     // Text drawing
     oled_set_cursor(0, 1);
-    if (mod_state & MOD_MASK_SHIFT) {
-        oled_write(get_date(false), false);
-    } else {
-        oled_write(get_time(false), false);
-    }
+		oled_write(get_time(false), false);
 
     // draw_rectangle(108, 6, 20, 11, false);
     if (biton32(layer_state) > 0) {
