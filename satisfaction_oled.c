@@ -501,11 +501,10 @@ static const char PROGMEM kirby_caps_walk[KIRBY_CAPS_WALK_FRAMES][DEFAULT_ANIM_S
 };
 
 // Generic variables
-uint32_t    anim_timer         = 0;
-uint8_t     prev_oled_mode     = 0;
-uint8_t     time_date_mode = 0; // 0 = time, 1 = date, 2 = text
-bool        space_pressed      = false;
-bool        showed_jump        = true;
+uint32_t anim_timer     = 0;
+uint8_t  prev_oled_mode = 0;
+bool     space_pressed  = false;
+bool     showed_jump    = true;
 
 // Bongo frames and variables
 uint8_t bongo_current_idle_frame     = 0;
@@ -527,7 +526,6 @@ uint8_t kirby_caps_state              = 0;  // 0 = no caps, 1 = in caps, 2 = exi
 
 // Dynamic bongo variables
 uint8_t bongo_state_tap = 0;
-bool    is_bongo_filled = false;
 
 oled_rotation_t oled_init_kb(oled_rotation_t rotation) { return OLED_ROTATION_0; }
 
@@ -541,36 +539,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 space_pressed = false;
             }
             break;
-        case KC_F22:
-            if (record->event.pressed) {
-                time_date_mode = (time_date_mode + 1) % 3;
-            }
-            break;
         case KC_F23:
-            if (record->event.pressed) {
-                if (oled_mode == OLED_PETS) {
-                    pet_mode = (pet_mode + 1) % _NUM_PET_MODES;
-                } else if (oled_mode == OLED_BONGO) {
-                    is_bongo_filled = !is_bongo_filled;
-                }
-                anim_timer = 99;  // forces an animation reset
-            }
-            break;
         case KC_F24:
-            if (record->event.pressed) {
-                if (oled_mode == OLED_PETS) {
-                    pet_mode = (pet_mode - 1 < 0) ? _NUM_PET_MODES - 1 : (pet_mode - 1) % _NUM_PET_MODES;
-                } else if (oled_mode == OLED_BONGO) {
-                    is_bongo_filled = !is_bongo_filled;
-                }
-                anim_timer = 99;  // forces an animation reset
-            }
+            anim_timer = 99;  // forces an animation reset
             break;
     }
     if (record->event.pressed) {
         bongo_state_tap = 1;
     }
     return true;
+}
+
+bool is_bongo_filled(void) {
+    return bongo_mode == 0 ? false : true;
 }
 
 static char* get_wpm_str(void) {
@@ -809,7 +790,7 @@ static char* get_date(bool show_full) {
 }
 
 void draw_pet_text_section(void) {
-    switch (time_date_mode) {
+    switch (date_time_mode) {
         default:
         case 0:
             oled_set_cursor(14, 1);
@@ -953,7 +934,7 @@ void draw_matrix() {
         }
     }
 
-    switch (time_date_mode) {
+    switch (date_time_mode) {
         default:
         case 0:
             oled_set_cursor(14, 1);
@@ -1009,44 +990,44 @@ void draw_bongo_dynamic() {
     void animation_phase(uint8_t mode) {
         if (led_state.caps_lock) {
             bongo_current_caps_frame = (bongo_current_caps_frame + 1) % BONGO_CAPS_FRAMES;
-            oled_write_raw_P(is_bongo_filled ? bongo_filled_caps[abs((BONGO_CAPS_FRAMES - 1) - bongo_current_caps_frame)] : bongo_caps[abs((BONGO_CAPS_FRAMES - 1) - bongo_current_caps_frame)], DEFAULT_ANIM_SIZE);
+            oled_write_raw_P(is_bongo_filled() ? bongo_filled_caps[abs((BONGO_CAPS_FRAMES - 1) - bongo_current_caps_frame)] : bongo_caps[abs((BONGO_CAPS_FRAMES - 1) - bongo_current_caps_frame)], DEFAULT_ANIM_SIZE);
             return;
         }
         bongo_current_caps_frame = 0;
         if (mode == 1) {
             bongo_current_pre_idle_frame = (bongo_current_pre_idle_frame + 1) % BONGO_PRE_IDLE_FRAMES;
-            oled_write_raw_P(is_bongo_filled ? bongo_filled_pre_idle[abs((BONGO_PRE_IDLE_FRAMES - 1) - bongo_current_pre_idle_frame)] : bongo_pre_idle[abs((BONGO_PRE_IDLE_FRAMES - 1) - bongo_current_pre_idle_frame)], DEFAULT_ANIM_SIZE);
+            oled_write_raw_P(is_bongo_filled() ? bongo_filled_pre_idle[abs((BONGO_PRE_IDLE_FRAMES - 1) - bongo_current_pre_idle_frame)] : bongo_pre_idle[abs((BONGO_PRE_IDLE_FRAMES - 1) - bongo_current_pre_idle_frame)], DEFAULT_ANIM_SIZE);
         } else {
             bongo_current_idle_frame = (bongo_current_idle_frame + 1) % BONGO_IDLE_FRAMES;
-            oled_write_raw_P(is_bongo_filled ? bongo_filled_idle[abs((BONGO_IDLE_FRAMES - 1) - bongo_current_idle_frame)] : bongo_idle[abs((BONGO_IDLE_FRAMES - 1) - bongo_current_idle_frame)], DEFAULT_ANIM_SIZE);
+            oled_write_raw_P(is_bongo_filled() ? bongo_filled_idle[abs((BONGO_IDLE_FRAMES - 1) - bongo_current_idle_frame)] : bongo_idle[abs((BONGO_IDLE_FRAMES - 1) - bongo_current_idle_frame)], DEFAULT_ANIM_SIZE);
         }
     }
 
     if (mod_state & MOD_MASK_CTRL) {
-        oled_write_raw_P(is_bongo_filled ? bongo_filled_hiding[0] : bongo_hiding[0], DEFAULT_ANIM_SIZE);
+        oled_write_raw_P(is_bongo_filled() ? bongo_filled_hiding[0] : bongo_hiding[0], DEFAULT_ANIM_SIZE);
         anim_timer      = timer_read32();
         bongo_state_tap = 2;
     } else if (mod_state & MOD_MASK_GUI) {
-        oled_write_raw_P(is_bongo_filled ? bongo_filled_blushing[0] : bongo_blushing[0], DEFAULT_ANIM_SIZE);
+        oled_write_raw_P(is_bongo_filled() ? bongo_filled_blushing[0] : bongo_blushing[0], DEFAULT_ANIM_SIZE);
         anim_timer      = timer_read32();
         bongo_state_tap = 2;
     } else if (bongo_state_tap == 1) {
         if (led_state.caps_lock) {
-            oled_write_raw_P(is_bongo_filled ? bongo_filled_caps[1] : bongo_caps[1], DEFAULT_ANIM_SIZE);
+            oled_write_raw_P(is_bongo_filled() ? bongo_filled_caps[1] : bongo_caps[1], DEFAULT_ANIM_SIZE);
         } else if (wpm() > 140) {
             bongo_current_tap_frame = (bongo_current_tap_frame + 1) % BONGO_TAP_FRAMES;
-            oled_write_raw_P(is_bongo_filled ? bongo_filled_tap_cute[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)] : bongo_tap_cute[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)], DEFAULT_ANIM_SIZE);
+            oled_write_raw_P(is_bongo_filled() ? bongo_filled_tap_cute[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)] : bongo_tap_cute[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)], DEFAULT_ANIM_SIZE);
         } else {
             bongo_current_tap_frame = (bongo_current_tap_frame + 1) % BONGO_TAP_FRAMES;
-            oled_write_raw_P(is_bongo_filled ? bongo_filled_tap[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)] : bongo_tap[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)], DEFAULT_ANIM_SIZE);
+            oled_write_raw_P(is_bongo_filled() ? bongo_filled_tap[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)] : bongo_tap[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)], DEFAULT_ANIM_SIZE);
         }
         anim_timer      = timer_read32();
         bongo_state_tap = 2;
     } else if (timer_elapsed32(anim_timer) < 3000 && bongo_state_tap == 2) {
         if (led_state.caps_lock) {
-            oled_write_raw_P(is_bongo_filled ? bongo_filled_caps[0] : bongo_caps[0], DEFAULT_ANIM_SIZE);
+            oled_write_raw_P(is_bongo_filled() ? bongo_filled_caps[0] : bongo_caps[0], DEFAULT_ANIM_SIZE);
         } else {
-            oled_write_raw_P(is_bongo_filled ? bongo_filled_prep[0] : bongo_prep[0], DEFAULT_ANIM_SIZE);
+            oled_write_raw_P(is_bongo_filled() ? bongo_filled_prep[0] : bongo_prep[0], DEFAULT_ANIM_SIZE);
         }
     } else {
         bongo_state_tap = 0;
@@ -1063,7 +1044,7 @@ void draw_bongo_dynamic() {
 
     // Text drawing
     oled_set_cursor(0, 1);
-    switch (time_date_mode) {
+    switch (date_time_mode) {
         case 0:
             oled_write(get_time(false), false);
             break;
@@ -1089,7 +1070,7 @@ void draw_bongo_dynamic() {
         oled_write(get_enc_mode(), false);
     }
 
-    if (time_date_mode != 2) {
+    if (date_time_mode != 2) {
         oled_set_cursor(18, 3);
         oled_write(get_wpm_str(), false);
     }

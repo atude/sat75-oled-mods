@@ -13,6 +13,10 @@
 #define EEPROM_CUSTOM_BACKLIGHT (VIA_EEPROM_CUSTOM_CONFIG_ADDR+1)
 #define EEPROM_DEFAULT_OLED (VIA_EEPROM_CUSTOM_CONFIG_ADDR+2)
 #define EEPROM_CUSTOM_ENCODER (VIA_EEPROM_CUSTOM_CONFIG_ADDR+3)
+#define EEPROM_ATUDE_OLED_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+4)
+#define EEPROM_ATUDE_DATETIME_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+5)
+#define EEPROM_ATUDE_BONGO_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+6)
+#define EEPROM_ATUDE_PET_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+7)
 
 typedef union {
     uint8_t raw;
@@ -34,7 +38,7 @@ enum s75_keyboard_value_id {
   id_encoder_modes = 0x80,
   id_oled_default_mode,
   id_encoder_custom,
-  id_oled_mode
+  id_oled_mode,
 };
 
 enum encoder_modes {
@@ -78,7 +82,11 @@ extern uint8_t layer;
 
 // OLED Behavior
 extern uint8_t oled_mode;
+// atudes ->
 extern uint8_t pet_mode;
+extern uint8_t bongo_mode;
+extern uint8_t date_time_mode;
+// <--
 extern bool oled_repaint_requested;
 extern bool oled_wakeup_requested;
 extern uint32_t oled_sleep_timer;

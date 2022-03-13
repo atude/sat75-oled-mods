@@ -87,7 +87,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 1 for custom backlighting controls (1 byte)
 // 1 for OLED default mode (1 byte)
 // 6 for 3x custom encoder settings, left, right, and press (18 bytes)
-#define VIA_EEPROM_CUSTOM_CONFIG_SIZE 21
+// 1 for atude oled mode
+// 1 for bongo mode
+// 1 for kirby/luna mode
+// 1 for time mode
+#define VIA_EEPROM_CUSTOM_CONFIG_SIZE 25 // default: 21
 
 // VIA lighting is handled by the keyboard-level code
 #define VIA_CUSTOM_LIGHTING_ENABLE

@@ -24,6 +24,8 @@ uint8_t layer;
 bool clock_set_mode = false;
 uint8_t oled_mode = OLED_DEFAULT;
 uint8_t pet_mode = PET_LUNA;
+uint8_t bongo_mode = 0;
+uint8_t date_time_mode = 0;
 bool oled_repaint_requested = false;
 bool oled_wakeup_requested = false;
 uint32_t oled_sleep_timer;
@@ -249,10 +251,39 @@ layer_state_t layer_state_set_kb(layer_state_t state) {
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
   oled_request_wakeup();
   switch (keycode) {
+    case KC_F22:
+        if (record->event.pressed) {
+            date_time_mode = (date_time_mode + 1) % 3;
+            eeprom_update_byte((uint8_t*)EEPROM_ATUDE_DATETIME_MODE, date_time_mode);
+        }
+        break;
+    case KC_F23:
+        if (record->event.pressed) {
+            if (oled_mode == OLED_PETS) {
+                pet_mode = (pet_mode + 1) % _NUM_PET_MODES;
+                eeprom_update_byte((uint8_t*)EEPROM_ATUDE_PET_MODE, pet_mode);
+            } else if (oled_mode == OLED_BONGO) {
+                bongo_mode = (bongo_mode + 1) % 2;
+                eeprom_update_byte((uint8_t*)EEPROM_ATUDE_BONGO_MODE, bongo_mode);
+            }
+        }
+        break;
+    case KC_F24:
+        if (record->event.pressed) {
+            if (oled_mode == OLED_PETS) {
+                pet_mode = (pet_mode - 1 < 0) ? _NUM_PET_MODES - 1 : (pet_mode - 1) % _NUM_PET_MODES;
+                eeprom_update_byte((uint8_t*)EEPROM_ATUDE_PET_MODE, pet_mode);
+            } else if (oled_mode == OLED_BONGO) {
+                bongo_mode = (bongo_mode + 1) % 2;
+                eeprom_update_byte((uint8_t*)EEPROM_ATUDE_BONGO_MODE, bongo_mode);
+            }
+        }
+        break;
     case OLED_TOGG:
       if(!clock_set_mode){
         if (record->event.pressed) {
           oled_mode = (oled_mode + 1) % _NUM_OLED_MODES;
+          eeprom_update_byte((uint8_t*)EEPROM_ATUDE_OLED_MODE, oled_mode);
         }
       }
       return false;
@@ -340,7 +371,10 @@ void backlight_config_save(){
 void custom_config_load(){
   kb_backlight_config.raw = eeprom_read_byte((uint8_t*)EEPROM_CUSTOM_BACKLIGHT);
 #ifdef DYNAMIC_KEYMAP_ENABLE
-  oled_mode = eeprom_read_byte((uint8_t*)EEPROM_DEFAULT_OLED);
+  oled_mode = eeprom_read_byte((uint8_t*)EEPROM_ATUDE_OLED_MODE);
+  bongo_mode = eeprom_read_byte((uint8_t*)EEPROM_ATUDE_BONGO_MODE);
+  pet_mode = eeprom_read_byte((uint8_t*)EEPROM_ATUDE_PET_MODE);
+  date_time_mode = eeprom_read_byte((uint8_t*)EEPROM_ATUDE_DATETIME_MODE);
   enabled_encoder_modes = eeprom_read_byte((uint8_t*)EEPROM_ENABLED_ENCODER_MODES);
 #endif
 }
