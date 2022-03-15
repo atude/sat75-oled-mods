@@ -24,8 +24,9 @@ uint8_t layer;
 bool clock_set_mode = false;
 uint8_t oled_mode = OLED_DEFAULT;
 uint8_t pet_mode = PET_LUNA;
-uint8_t bongo_mode = 0;
-uint8_t date_time_mode = 0;
+uint8_t bongo_mode = 0; // 0 = outline, 1 = filled
+uint8_t date_time_mode = 0; // 0 = time, 1 = date, 2 = none
+uint8_t timeout_mode = 0; // 0 = 1m30s, 1 = 2m, 2 = 5m, 3 = 1m
 bool oled_repaint_requested = false;
 bool oled_wakeup_requested = false;
 uint32_t oled_sleep_timer;
@@ -375,6 +376,7 @@ void custom_config_load(){
   bongo_mode = eeprom_read_byte((uint8_t*)EEPROM_ATUDE_BONGO_MODE);
   pet_mode = eeprom_read_byte((uint8_t*)EEPROM_ATUDE_PET_MODE);
   date_time_mode = eeprom_read_byte((uint8_t*)EEPROM_ATUDE_DATETIME_MODE);
+  timeout_mode = eeprom_read_byte((uint8_t*)EEPROM_ATUDE_TIMEOUT_MODE);
   enabled_encoder_modes = eeprom_read_byte((uint8_t*)EEPROM_ENABLED_ENCODER_MODES);
 #endif
 }

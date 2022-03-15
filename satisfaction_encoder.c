@@ -83,6 +83,10 @@ void update_time_config(int8_t increment){
         day_config += day_limit;
       }
       break;
+    case 5: //timeout
+      timeout_mode = (timeout_mode + increment < 0) ? 3 : (timeout_mode + increment) % 4;
+      eeprom_update_byte((uint8_t*)EEPROM_ATUDE_TIMEOUT_MODE, timeout_mode);
+      break;
   }
 }
 
@@ -209,7 +213,7 @@ uint16_t handle_encoder_press(){
       break;
 #endif
     case ENC_MODE_CLOCK_SET:
-      time_config_idx = (time_config_idx + 1) % 5;
+      time_config_idx = (time_config_idx + 1) % 6;
     case ENC_MODE_BRIGHTNESS:
       break;
   }

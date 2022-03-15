@@ -17,6 +17,7 @@
 #define EEPROM_ATUDE_DATETIME_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+5)
 #define EEPROM_ATUDE_BONGO_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+6)
 #define EEPROM_ATUDE_PET_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+7)
+#define EEPROM_ATUDE_TIMEOUT_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+8)
 
 typedef union {
     uint8_t raw;
@@ -86,6 +87,7 @@ extern uint8_t oled_mode;
 extern uint8_t pet_mode;
 extern uint8_t bongo_mode;
 extern uint8_t date_time_mode;
+extern uint8_t timeout_mode;
 // <--
 extern bool oled_repaint_requested;
 extern bool oled_wakeup_requested;
