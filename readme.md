@@ -1,4 +1,14 @@
-# Satisfaction75
+# Satisfaction 75 OLED mod
+
+[Join the discord for more information and downloadable .bins](https://discord.gg/MddWhNPpkB)
+
+### Includes
+
+- Bongo cat
+- Keyboard matrix
+- Luna
+- Kirby
+- Persistent settings with ability to set OLED timeout
 
 ### Requirements
 
