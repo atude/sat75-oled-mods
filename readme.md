@@ -1,6 +1,6 @@
 # Satisfaction 75 OLED mods
 
-[Join the discord for more information and downloadable .bins](https://discord.gg/MddWhNPpkB)
+[Join the discord for information on all features and downloadable .bins!](https://discord.gg/MddWhNPpkB)
 
 ### Includes
 
