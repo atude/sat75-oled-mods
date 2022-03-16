@@ -1,10 +1,10 @@
-# Satisfaction 75 OLED mod
+# Satisfaction 75 OLED mods
 
 [Join the discord for more information and downloadable .bins](https://discord.gg/MddWhNPpkB)
 
 ### Includes
 
-- Bongo cat
+- Bongo cat - outlined and filled, interactions with winkey, ctrl, caps lock, wpm, etc.
 - Keyboard matrix
 - Luna
 - Kirby
