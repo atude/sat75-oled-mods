@@ -4,10 +4,10 @@
 
 ### Instructions
 
+1. Download the *satisfaction75_atude_vXX.bin* in this repo
 1. Open QMK toolbox
-2. Put your Satisfaction75 in bootloader mode by pressing *FN+LCTRL*
-3. Load the *satisfaction75_atude_vXX.bin*
-4. Flash
+1. Put your Satisfaction75 in bootloader mode by pressing *FN+LCTRL*
+1. Load the bin file and flash
 
 ### Includes
 
@@ -16,6 +16,9 @@
 - Luna
 - Kirby
 - Persistent settings with ability to set OLED timeout
+- More info available in discord server
+
+## Development
 
 ### Requirements
 
