@@ -72,6 +72,7 @@ enum oled_modes {
 enum pet_modes {
     PET_LUNA,
     PET_KIRBY,
+    PET_PUSHEEN,
     _NUM_PET_MODES,
 };
 
