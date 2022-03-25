@@ -6,7 +6,7 @@
 
 ### Instructions
 
-1. Download the *satisfaction75_atude_vXX.bin* in this repo
+1. Download the *satisfaction75_atude_vXX.bin* in this repo (or in the discord server)
 1. Open QMK toolbox
 1. Put your Satisfaction75 in bootloader mode by pressing *FN+LCTRL*
 1. Load the bin file and flash
@@ -29,6 +29,7 @@ These are controls outside of the default Satisfaction75 mappings:
 - **F22** -> Change time display to time, date, or info text
 - **Clock Set** -> Settings
 
+Detailed controls and mappings found in the Discord server
 
 ## Development
 
