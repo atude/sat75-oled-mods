@@ -1,3 +1,5 @@
+![](https://raw.githubusercontent.com/atude/sat75-oled-mods/main/banner.png)
+
 # Satisfaction 75 OLED mods
 
 [Join the discord for information on all features and downloadable .bins!](https://discord.gg/MddWhNPpkB)
@@ -15,8 +17,18 @@
 - Keyboard matrix
 - Luna
 - Kirby
+- Pusheen
 - Persistent settings with ability to set OLED timeout
 - More info available in discord server
+
+### Control mappings
+
+These are controls outside of the default Satisfaction75 mappings:
+
+- **F23/F24** -> Change between outlined and filled bongo. Or change between luna, kirby and pusheen
+- **F22** -> Change time display to time, date, or info text
+- **Clock Set** -> Settings
+
 
 ## Development
 
