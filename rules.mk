@@ -9,6 +9,7 @@ BOOTLOADER = stm32-dfu
 DFU_SUFFIX_ARGS = -v FFFF -p FFFF
 
 SRC += led.c \
+	  render_gif.c \
       satisfaction_encoder.c \
       satisfaction_oled.c
 

@@ -90,7 +90,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 1 for time display mode
 // 1 for timeout
 // 1 for date and time format
-#define VIA_EEPROM_CUSTOM_CONFIG_SIZE 27 // default: 21
+// 1 for gif mode
+#define VIA_EEPROM_CUSTOM_CONFIG_SIZE 28 // default: 21
 
 // VIA lighting is handled by the keyboard-level code
 #define VIA_CUSTOM_LIGHTING_ENABLE

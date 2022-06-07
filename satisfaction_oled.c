@@ -1,4 +1,5 @@
 #include "satisfaction75.h"
+#include "render_gif.h"
 #include <stdio.h>
 
 void draw_settings(void);  // set time/date and settings
@@ -869,6 +870,9 @@ bool oled_task_kb(void) {
             break;
         case OLED_PETS:
             draw_current_pet();
+            break;
+        case OLD_GIF:
+            draw_gif();
             break;
         case OLED_OFF:
             oled_off();

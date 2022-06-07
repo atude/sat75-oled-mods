@@ -19,6 +19,7 @@
 #define EEPROM_ATUDE_PET_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+7)
 #define EEPROM_ATUDE_TIMEOUT_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+8)
 #define EEPROM_ATUDE_DATE_TIME_FORMAT_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+9)
+#define EEPROM_ATUDE_GIF_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR+10)
 
 typedef union {
     uint8_t raw;
@@ -66,6 +67,7 @@ enum oled_modes {
     OLED_DEFAULT,
     OLED_BONGO,
     OLED_PETS,
+    OLD_GIF,
     OLED_OFF,
     _NUM_OLED_MODES
 };
@@ -87,6 +89,7 @@ extern uint8_t layer;
 extern uint8_t oled_mode;
 // atudes ->
 extern uint8_t pet_mode;
+extern uint8_t gif_mode;
 extern uint8_t bongo_mode;
 extern uint8_t date_time_mode;
 extern uint8_t timeout_mode;
