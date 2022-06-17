@@ -47,6 +47,7 @@ int8_t  year_config           = 0;
 int8_t  month_config          = 0;
 int8_t  day_config            = 0;
 uint8_t previous_encoder_mode = 0;
+uint8_t enc_press_state       = 0; // 0 = none, 1 = pressed, 2 = pressed+turning
 
 backlight_config_t kb_backlight_config = {.enable = true, .breathing = true, .level = BACKLIGHT_LEVELS};
 
@@ -288,17 +289,23 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
         case ENC_PRESS:
+            uprintf("here\n");
             if (record->event.pressed) {
-                uint16_t mapped_code        = handle_encoder_press();
-                uint16_t held_keycode_timer = timer_read();
-                if (mapped_code != 0) {
-                    register_code16(mapped_code);
-                    while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY) { /* no-op */
-                    }
-                    unregister_code16(mapped_code);
-                }
+                enc_press_state = 1;
             } else {
-                // Do something else when release
+                // ignore enc press if we rotate the knob during press
+                if (enc_press_state == 1) {
+                    // Do ENC_PRESS action on release
+                    uint16_t mapped_code        = handle_encoder_press();
+                    uint16_t held_keycode_timer = timer_read();
+                    if (mapped_code != 0) {
+                        register_code16(mapped_code);
+                        while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY) { /* no-op */
+                        }
+                        unregister_code16(mapped_code);
+                    }
+                }
+                enc_press_state = 0;
             }
             return false;
         default:
@@ -316,9 +323,25 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
         if (layer == 0) {
             uint16_t mapped_code = 0;
             if (clockwise) {
-                mapped_code = handle_encoder_clockwise();
+                // if pressed or pressed+turning
+                if (enc_press_state > 0) {
+                    enc_press_state = 2;
+                    change_encoder_mode(false);
+                    mapped_code = handle_encoder_clockwise();
+                    change_encoder_mode(true);
+                } else {
+                    mapped_code = handle_encoder_clockwise();
+                }
             } else {
-                mapped_code = handle_encoder_ccw();
+                // if pressed or pressed+turning
+                if (enc_press_state > 0) {
+                    enc_press_state = 2;
+                    change_encoder_mode(false);
+                    mapped_code = handle_encoder_ccw();
+                    change_encoder_mode(true);
+                } else {
+                    mapped_code = handle_encoder_ccw();
+                }
             }
             uint16_t held_keycode_timer = timer_read();
             if (mapped_code != 0) {
