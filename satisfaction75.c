@@ -1,6 +1,6 @@
 #include "satisfaction75.h"
-#include "print.h"
-#include "debug.h"
+// #include "print.h"
+// #include "debug.h"
 
 #include <ch.h>
 #include <hal.h>
@@ -289,7 +289,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
         case ENC_PRESS:
-            uprintf("here\n");
             if (record->event.pressed) {
                 enc_press_state = 1;
             } else {

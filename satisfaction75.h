@@ -65,6 +65,7 @@ enum custom_encoder_behavior {
 
 enum oled_modes {
     OLED_DEFAULT,
+    OLED_CLOCK,
     OLED_BONGO,
     OLED_PETS,
     OLD_GIF,
