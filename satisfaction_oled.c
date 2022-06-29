@@ -485,11 +485,6 @@ void draw_matrix() {
         draw_rectangle(MATRIX_DISPLAY_X + ((0 + 2) * MATRIX_SCALE), MATRIX_DISPLAY_Y + ((3 + 2) * MATRIX_SCALE), MATRIX_SCALE * 2, MATRIX_SCALE, true);
     }
 
-    // draw wpm bar and outline
-    // draw_wpm_bar(68, 5, 6, min(wpm() / 6, 22), true);
-
-    draw_mods_square(mod_state, 11, 1);
-
     switch (date_time_mode) {
         default:
         case 0:
@@ -506,77 +501,19 @@ void draw_matrix() {
             break;
     }
 
-    oled_set_cursor(11, 3);
-    if (encoder_mode != ENC_MODE_VOLUME) {
-        draw_rectangle(65, 23, 19, 10, true);
-        draw_line_v(65 - 1, 24, 7);
-        draw_line_v(65 + 19, 24, 7);
-        oled_write(get_enc_mode(), true);
-    } else {
-        oled_write(get_enc_mode(), false);
-    }
-    oled_advance_char();
-    if (led_state.caps_lock) {
-        draw_rectangle(89, 23, 19, 10, true);
-        draw_line_v(88, 24, 7);
-        draw_line_v(89 + 19, 24, 7);
-        oled_write_P(PSTR("CAP"), true);
-    } else {
-        oled_write_P(PSTR("CAP"), false);
-    }
-    oled_advance_char();
-    if (biton32(layer_state) > 0) {
-        draw_rectangle(113, 23, 12, 10, true);
-        draw_line_v(113 - 1, 24, 7);
-        draw_line_v(113 + 12, 24, 7);
-        oled_write_P(PSTR("L"), true);
-        oled_write_char(get_highest_layer(layer_state) + 0x30, true);
-    } else {
-        oled_write_P(PSTR("L"), false);
-        oled_write_char(get_highest_layer(layer_state) + 0x30, false);
-    }
+    draw_mods_square(mod_state, 11, 1);
+    draw_info_panel(led_state, layer_state, get_enc_mode(), 11, 3, false);
 }
 
 void draw_clock() {
-    // led_t   led_state = host_keyboard_led_state();
+    led_t   led_state = host_keyboard_led_state();
     uint8_t mod_state = get_mods();
 
     draw_mods_square(mod_state, 1, 3);
-    draw_big_clock(last_minute, 5, 5, is_24hr_time());
-
-    // Date, other details
-    // oled_set_cursor(13, 1);
+    draw_big_clock(last_minute, 4, 3, is_24hr_time());
+    draw_info_panel(led_state, layer_state, get_enc_mode(), 3, 3, true);
+    draw_wpm_bar(18, wpm(), get_date(false));
     // oled_write(get_date(false), false);
-    // uint8_t x_start = 18;
-    // oled_set_cursor(4, 3);
-    // if (encoder_mode != ENC_MODE_VOLUME) {
-    //     draw_rectangle(x_start, 23, 19, 10, true);
-    //     draw_line_v(x_start - 1, 24, 7);
-    //     draw_line_v(x_start + 19, 24, 7);
-    //     oled_write(get_enc_mode(), true);
-    // } else {
-    //     oled_write(get_enc_mode(), false);
-    // }
-    // oled_advance_char();
-    // if (led_state.caps_lock) {
-    //     draw_rectangle(x_start + 24, 23, 19, 10, true);
-    //     draw_line_v(x_start + 24 - 1, 24, 7);
-    //     draw_line_v(x_start + 24 + 19, 24, 7);
-    //     oled_write_P(PSTR("CAP"), true);
-    // } else {
-    //     oled_write_P(PSTR("CAP"), false);
-    // }
-    // oled_advance_char();
-    // if (biton32(layer_state) > 0) {
-    //     draw_rectangle(x_start + 48, 23, 12, 10, true);
-    //     draw_line_v(x_start + 48 - 1, 24, 7);
-    //     draw_line_v(x_start + 48 + 12, 24, 7);
-    //     oled_write_P(PSTR("L"), true);
-    //     oled_write_char(get_highest_layer(layer_state) + 0x30, true);
-    // } else {
-    //     oled_write_P(PSTR("L"), false);
-    //     oled_write_char(get_highest_layer(layer_state) + 0x30, false);
-    // }
 };
 
 void draw_bongo_dynamic() {
