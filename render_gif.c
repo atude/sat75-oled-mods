@@ -10,6 +10,8 @@
 
 uint32_t gif_anim_timer = 0;
 
-void draw_gif() {}
+bool draw_gif_1() { return false; }
+bool draw_gif_2() { return false; }
+bool draw_gif_3() { return false; }
 
 #endif

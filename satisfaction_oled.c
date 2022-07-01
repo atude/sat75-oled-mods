@@ -115,56 +115,6 @@ static uint32_t get_timeout(void) {
     }
 }
 
-static char* get_date_time_format_str(void) {
-    static char format_str[13] = "";
-    switch (date_time_format_mode) {
-        default:
-        case 0:
-            sprintf(format_str, "12h dd/mm/yy");
-            break;
-        case 1:
-            sprintf(format_str, "24h dd/mm/yy");
-            break;
-        case 2:
-            sprintf(format_str, "12h mm/dd/yy");
-            break;
-        case 3:
-            sprintf(format_str, "24h mm/dd/yy");
-            break;
-    }
-    return format_str;
-}
-
-static char* get_timeout_str(void) {
-    static char timeout_str[6] = "";
-    switch (timeout_mode) {
-        default:
-        case 0:
-            sprintf(timeout_str, "1m30s");  // 1m30s
-            break;
-        case 1:
-            sprintf(timeout_str, "2m");  // 2m
-            break;
-        case 2:
-            sprintf(timeout_str, "5m");  // 5m
-            break;
-        case 3:
-            sprintf(timeout_str, "1m");  // 1m
-            break;
-    }
-    return timeout_str;
-}
-
-static char* get_wpm_str(void) {
-    static char wpm_str[5] = "";
-    if (wpm() > 0) {
-        sprintf(wpm_str, "%03d", wpm());
-    } else {
-        sprintf(wpm_str, "wpm");
-    }
-    return wpm_str;
-}
-
 void reset_animations(void) {
     anim_timer  = 0;
     showed_jump = true;
@@ -176,20 +126,26 @@ void draw_current_pet(void) {
     switch (pet_mode) {
         default:
         case PET_LUNA:
-            draw_luna();
+            if (!draw_gif_1()) {
+                draw_luna();
+            }
             return;
         case PET_PUSHEEN:
-            draw_pusheen();
+            if (!draw_gif_2()) {
+                draw_pusheen();
+            }
             return;
         case PET_KIRBY:
-            draw_kirby();
+            if (!draw_gif_3()) {
+                draw_kirby();
+            }
             return;
     }
 }
 
 static uint8_t get_frame_duration(void) { return max(200 - (wpm() * 0.65), 75); }
 
-// Will always run post every oled update, except for oled off
+// Will run before every oled update, except for oled off
 void bg_tasks(void) {
     // Updating encoder turn state
     if ((enc_turn_state >= 1 || enc_turn_state <= -1) && enc_turn_state != prev_enc_turn_state) {
@@ -218,6 +174,11 @@ bool oled_task_kb(void) {
         reset_animations();
         prev_oled_mode = oled_mode;
     }
+    if (oled_mode == OLED_OFF) {
+        oled_off();
+        return false;
+    }
+    bg_tasks();
     switch (oled_mode) {
         default:
         case OLED_DEFAULT:
@@ -234,16 +195,8 @@ bool oled_task_kb(void) {
         case OLED_PETS:
             draw_current_pet();
             break;
-        case OLD_GIF:
-            draw_gif();
-            break;
-        case OLED_OFF:
-            oled_off();
-            return false;
-            break;
     }
-    bg_tasks();
-    return false;
+		return false;
 }
 
 // Request a repaint of the OLED image without resetting the OLED sleep timer.
@@ -633,7 +586,11 @@ void draw_bongo_dynamic() {
 
     if (date_time_mode != 2) {
         oled_set_cursor(18, 3);
-        oled_write(get_wpm_str(), false);
+        if (wpm() > 0) {
+            oled_write(get_u8_str(wpm(), '0'), false);
+        } else {
+            oled_write_P(PSTR("wpm"), false);
+        }
     }
 }
 
@@ -815,11 +772,39 @@ void draw_settings() {
         oled_set_cursor(17, 2);
         oled_write_P(PSTR("DATE"), false);
     } else if (time_config_idx >= 5 && time_config_idx < 6) {
-        oled_write(get_date_time_format_str(), false);
+        switch (date_time_format_mode) {
+            default:
+            case 0:
+                oled_write_P(PSTR("12h dd/mm/yy"), false);
+                break;
+            case 1:
+                oled_write_P(PSTR("24h dd/mm/yy"), false);
+                break;
+            case 2:
+                oled_write_P(PSTR("12h mm/dd/yy"), false);
+                break;
+            case 3:
+                oled_write_P(PSTR("24h mm/dd/yy"), false);
+                break;
+        }
         oled_set_cursor(15, 2);
         oled_write_P(PSTR("FORMAT"), false);
     } else {
-        oled_write(get_timeout_str(), false);
+        switch (timeout_mode) {
+            default:
+            case 0:
+                oled_write_P(PSTR("1m30s"), false);
+                break;
+            case 1:
+                oled_write_P(PSTR("2m"), false);
+                break;
+            case 2:
+                oled_write_P(PSTR("5m"), false);
+                break;
+            case 3:
+                oled_write_P(PSTR("1m"), false);
+                break;
+        }
         oled_set_cursor(14, 2);
         oled_write_P(PSTR("TIMEOUT"), false);
     }

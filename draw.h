@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 
 #define min(x, y) (((x) >= (y)) ? (y) : (x))
 

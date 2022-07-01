@@ -18,9 +18,8 @@
 #define EEPROM_ATUDE_PET_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR + 6)
 #define EEPROM_ATUDE_TIMEOUT_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR + 7)
 #define EEPROM_ATUDE_DATE_TIME_FORMAT_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR + 8)
-#define EEPROM_ATUDE_GIF_MODE (VIA_EEPROM_CUSTOM_CONFIG_ADDR + 9)
 // Keep encoder at the end since it uses some extra storage for custom enc modes
-#define EEPROM_CUSTOM_ENCODER (VIA_EEPROM_CUSTOM_CONFIG_ADDR + 10)
+#define EEPROM_CUSTOM_ENCODER (VIA_EEPROM_CUSTOM_CONFIG_ADDR + 9)
 
 typedef union {
     uint8_t raw;
@@ -60,7 +59,7 @@ enum encoder_modes {
 
 enum custom_encoder_behavior { ENC_CUSTOM_CW = 0, ENC_CUSTOM_CCW, ENC_CUSTOM_PRESS };
 
-enum oled_modes { OLED_DEFAULT, OLED_CLOCK, OLED_BONGO, OLED_PETS, OLD_GIF, OLED_OFF, _NUM_OLED_MODES };
+enum oled_modes { OLED_DEFAULT, OLED_CLOCK, OLED_BONGO, OLED_PETS, OLED_OFF, _NUM_OLED_MODES };
 
 enum pet_modes {
     PET_LUNA,
@@ -80,7 +79,6 @@ extern uint8_t oled_mode;
 
 // atudes ->
 extern uint8_t pet_mode;
-extern uint8_t gif_mode;
 extern uint8_t bongo_mode;
 extern uint8_t date_time_mode;
 extern uint8_t timeout_mode;

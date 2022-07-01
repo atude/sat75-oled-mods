@@ -24,7 +24,6 @@ uint8_t layer;
 bool     clock_set_mode         = false;
 uint8_t  oled_mode              = OLED_DEFAULT;
 uint8_t  pet_mode               = PET_LUNA;
-uint8_t  gif_mode               = 0;  // 0, 1 and 2 gifs (3 gifs total)
 uint8_t  bongo_mode             = 0;  // 0 = outline, 1 = filled
 uint8_t  date_time_mode         = 0;  // 0 = time, 1 = date, 2 = none
 uint8_t  timeout_mode           = 0;  // 0 = 1m30s, 1 = 2m, 2 = 5m, 3 = 1m
@@ -244,9 +243,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
                 } else if (oled_mode == OLED_BONGO) {
                     bongo_mode = (bongo_mode + 1) % 2;
                     eeprom_update_byte((uint8_t *)EEPROM_ATUDE_BONGO_MODE, bongo_mode);
-                } else if (oled_mode == OLD_GIF) {
-                    gif_mode = (gif_mode + 1) % 3;
-                    eeprom_update_byte((uint8_t *)EEPROM_ATUDE_GIF_MODE, gif_mode);
                 }
             }
             break;
@@ -258,9 +254,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
                 } else if (oled_mode == OLED_BONGO) {
                     bongo_mode = (bongo_mode + 1) % 2;
                     eeprom_update_byte((uint8_t *)EEPROM_ATUDE_BONGO_MODE, bongo_mode);
-                } else if (oled_mode == OLD_GIF) {
-                    gif_mode = (gif_mode - 1 < 0) ? 3 - 1 : (gif_mode - 1) % 3;
-                    eeprom_update_byte((uint8_t *)EEPROM_ATUDE_GIF_MODE, gif_mode);
                 }
             }
             break;
@@ -393,7 +386,6 @@ void custom_config_load() {
     timeout_mode          = eeprom_read_byte((uint8_t *)EEPROM_ATUDE_TIMEOUT_MODE);
     date_time_format_mode = eeprom_read_byte((uint8_t *)EEPROM_ATUDE_DATE_TIME_FORMAT_MODE);
     enabled_encoder_modes = eeprom_read_byte((uint8_t *)EEPROM_ENABLED_ENCODER_MODES);
-    gif_mode              = eeprom_read_byte((uint8_t *)EEPROM_ATUDE_GIF_MODE);
 #endif
 }
 
