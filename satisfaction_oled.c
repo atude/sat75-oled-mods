@@ -339,11 +339,13 @@ void draw_pet_text(bool as_overlay) {
 
         // BG box
         if (as_overlay) {
-            draw_rectangle(74, 0, 58, 32, false);
-            draw_line_v(73, 2, 28, false);
-            draw_line_v(72, 4, 24, false);
-            draw_line_v(71, 6, 20, false);
-            draw_line_v(70, 8, 16, false);
+            draw_rectangle(71, 0, 58, 32, false);
+            draw_line_v(70, 1, 31, false);
+            draw_line_v(69, 2, 30, false);
+            draw_line_v(68, 3, 29, false);
+            draw_line_v(67, 5, 27, false);
+            draw_line_v(66, 8, 24, false);
+            draw_line_v(65, 13, 19, false);
         }
 
         switch (date_time_mode) {
