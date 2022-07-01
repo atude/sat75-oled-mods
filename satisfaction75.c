@@ -47,7 +47,8 @@ int8_t  year_config           = 0;
 int8_t  month_config          = 0;
 int8_t  day_config            = 0;
 uint8_t previous_encoder_mode = 0;
-uint8_t enc_press_state       = 0; // 0 = none, 1 = pressed, 2 = pressed+turning
+uint8_t enc_press_state       = 0;  // 0 = none, 1 = pressed, 2 = pressed+turning
+int8_t  enc_turn_state        = 0;  // -1 and less = ccw, 1 and more = cw, resets at 200 and -200
 
 backlight_config_t kb_backlight_config = {.enable = true, .breathing = true, .level = BACKLIGHT_LEVELS};
 
@@ -317,11 +318,16 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
 bool encoder_update_kb(uint8_t index, bool clockwise) {
     if (!encoder_update_user(index, clockwise)) return false;
     oled_request_wakeup();
-    encoder_value = (encoder_value + (clockwise ? 1 : -1)) % 64;
+    encoder_value  = (encoder_value + (clockwise ? 1 : -1)) % 64;
     if (index == 0) {
         if (layer == 0) {
             uint16_t mapped_code = 0;
             if (clockwise) {
+                if (enc_turn_state > 0) {
+                    enc_turn_state = (enc_turn_state + 1) % 100;
+                } else {
+                    enc_turn_state = 1;
+                }
                 // if pressed or pressed+turning
                 if (enc_press_state > 0) {
                     enc_press_state = 2;
@@ -332,6 +338,11 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
                     mapped_code = handle_encoder_clockwise();
                 }
             } else {
+                if (enc_turn_state < 0) {
+                    enc_turn_state = (enc_turn_state - 1) % -100;
+                } else {
+                    enc_turn_state = -1;
+                }
                 // if pressed or pressed+turning
                 if (enc_press_state > 0) {
                     enc_press_state = 2;

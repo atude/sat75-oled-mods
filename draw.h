@@ -45,8 +45,8 @@ static void draw_rectangle(uint8_t x, uint8_t y, uint8_t x_len, uint8_t y_len, b
 
 // Draws from bottom y to top y. Only cursor x controllable
 static void draw_wpm_bar(uint8_t cursor_x, uint8_t wpm, char* date) {
-    uint8_t x = (cursor_x * 5) + cursor_x - 1;
-    uint8_t y = 5;
+    uint8_t x     = (cursor_x * 5) + cursor_x - 1;
+    uint8_t y     = 5;
     uint8_t y_len = min(wpm / 6, 22);
     for (uint8_t i = 0; i < 13; i++) {
         for (uint8_t j = 0; j < y_len; j++) {
@@ -64,8 +64,8 @@ static void draw_wpm_bar(uint8_t cursor_x, uint8_t wpm, char* date) {
 
     // Embed date in wpm bar
     if (wpm < 20) {
-        char date_first_section[3] = { date[0], date[1], '\0' };
-        char date_second_section[3] = { date[3], date[4], '\0' };
+        char date_first_section[3]  = {date[0], date[1], '\0'};
+        char date_second_section[3] = {date[3], date[4], '\0'};
         oled_set_cursor(cursor_x, 1);
         oled_write(date_first_section, false);
         oled_set_cursor(cursor_x, 2);
@@ -78,7 +78,7 @@ static void draw_wpm_bar(uint8_t cursor_x, uint8_t wpm, char* date) {
  */
 
 // Mods square (S, C, A, G)
-static void draw_mods_square(uint8_t mod_state, uint8_t cursor_x, uint8_t cursor_y) {
+static void draw_mods_square(uint8_t mod_state, int8_t enc_turn_state, bool show_enc_turn, uint8_t cursor_x, uint8_t cursor_y) {
     uint8_t x = (cursor_x * 5) + cursor_x - 1;
     uint8_t y = cursor_y * 8;
     oled_set_cursor(cursor_x, cursor_y);
@@ -86,7 +86,7 @@ static void draw_mods_square(uint8_t mod_state, uint8_t cursor_x, uint8_t cursor
     draw_line_h(x, y + 7, 7);
     draw_line_v(x - 1, y, 7);
     draw_line_v(x + 7, y, 7);
-    if ((mod_state & MOD_MASK_SHIFT) || (mod_state & MOD_MASK_CTRL) || (mod_state & MOD_MASK_ALT) || (mod_state & MOD_MASK_GUI)) {
+    if ((mod_state & MOD_MASK_SHIFT) || (mod_state & MOD_MASK_CTRL) || (mod_state & MOD_MASK_ALT) || (mod_state & MOD_MASK_GUI) || (enc_turn_state != 0 && show_enc_turn)) {
         draw_rectangle(x, y - 1, 7, 9, true);
         if (mod_state & MOD_MASK_SHIFT) {
             oled_write_P(PSTR("S"), true);
@@ -96,6 +96,10 @@ static void draw_mods_square(uint8_t mod_state, uint8_t cursor_x, uint8_t cursor
             oled_write_P(PSTR("A"), true);
         } else if (mod_state & MOD_MASK_GUI) {
             oled_write_P(PSTR("G"), true);
+        } else if (enc_turn_state >= 1) {
+            oled_write_P(PSTR("+"), true);
+        } else if (enc_turn_state <= 1) {
+            oled_write_P(PSTR("-"), true);
         }
     }
 }
@@ -107,7 +111,7 @@ static void draw_info_panel(led_t led_state, uint8_t layer_state, char* enc_mode
     uint8_t long_caps_x_add = is_long_caps ? 6 : 0;
 
     oled_set_cursor(cursor_x, cursor_y);
-    if (encoder_mode != ENC_MODE_VOLUME) {
+    if (enc_press_state > 0) {
         draw_rectangle(x, y - 1, 19, 10, true);
         draw_line_v(x - 1, y, 8);
         draw_line_v(x + 19, y, 8);

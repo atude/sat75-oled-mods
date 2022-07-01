@@ -26,6 +26,11 @@ void draw_kirby(void);
 /* Shared defines */
 #    define PRE_SLEEP_TIMEOUT (get_timeout() - 30000)
 
+// Enc turn state
+int8_t   prev_enc_turn_state  = 0;  // just for tracking
+uint32_t enc_turn_state_timer = 0;
+bool     show_enc_turn  = false;
+
 // Generic variables
 uint32_t anim_timer     = 0;
 uint8_t  prev_oled_mode = 0;
@@ -184,6 +189,19 @@ void draw_current_pet(void) {
 
 static uint8_t get_frame_duration(void) { return max(200 - (wpm() * 0.65), 75); }
 
+// Will always run post every oled update, except for oled off
+void bg_tasks(void) {
+    // Updating encoder turn state
+    if ((enc_turn_state >= 1 || enc_turn_state <= -1) && enc_turn_state != prev_enc_turn_state) {
+        show_enc_turn  = true;
+        prev_enc_turn_state  = enc_turn_state;
+        enc_turn_state_timer = timer_read32();
+    }
+    if (timer_elapsed32(enc_turn_state_timer) > 500) {
+        show_enc_turn = false;
+    }
+}
+
 bool oled_task_kb(void) {
     if (!oled_task_user()) {
         return false;
@@ -221,8 +239,10 @@ bool oled_task_kb(void) {
             break;
         case OLED_OFF:
             oled_off();
+            return false;
             break;
     }
+    bg_tasks();
     return false;
 }
 
@@ -445,7 +465,7 @@ void draw_matrix() {
                 }
                 // dont print misaligned parts
                 if (!(x == 5 && y == 15)) {
-                    // r est of characters
+                    // rest of characters
                     draw_rectangle(MATRIX_DISPLAY_X + ((y + 2) * MATRIX_SCALE), MATRIX_DISPLAY_Y + ((x + 2) * MATRIX_SCALE), MATRIX_SCALE, MATRIX_SCALE, true);
                 }
             }
@@ -501,7 +521,7 @@ void draw_matrix() {
             break;
     }
 
-    draw_mods_square(mod_state, 11, 1);
+    draw_mods_square(mod_state, enc_turn_state, show_enc_turn, 11, 1);
     draw_info_panel(led_state, layer_state, get_enc_mode(), 11, 3, false);
 }
 
@@ -509,7 +529,7 @@ void draw_clock() {
     led_t   led_state = host_keyboard_led_state();
     uint8_t mod_state = get_mods();
 
-    draw_mods_square(mod_state, 1, 3);
+    draw_mods_square(mod_state, enc_turn_state, show_enc_turn, 1, 3);
     draw_big_clock(last_minute, 4, 3, is_24hr_time());
     draw_info_panel(led_state, layer_state, get_enc_mode(), 3, 3, true);
     draw_wpm_bar(18, wpm(), get_date(false));
