@@ -28,9 +28,9 @@ static void draw_line_h(uint8_t x, uint8_t y, uint8_t len) {
     }
 }
 
-static void draw_line_v(uint8_t x, uint8_t y, uint8_t len) {
+static void draw_line_v(uint8_t x, uint8_t y, uint8_t len, bool on) {
     for (uint8_t i = 0; i < len; i++) {
-        oled_write_pixel(x, i + y, true);
+        oled_write_pixel(x, i + y, on);
     }
 }
 
@@ -52,10 +52,10 @@ static void draw_wpm_bar(uint8_t cursor_x, uint8_t wpm, char* date) {
             oled_write_pixel(i + x, 22 - j + y, true);
         }
     }
-    draw_line_v(x - 3, y, 24);
-    draw_line_v(x - 2, y - 1, 26);
-    draw_line_v(x + 14, y - 1, 26);
-    draw_line_v(x + 15, y, 24);
+    draw_line_v(x - 3, y, 24, true);
+    draw_line_v(x - 2, y - 1, 26, true);
+    draw_line_v(x + 14, y - 1, 26, true);
+    draw_line_v(x + 15, y, 24, true);
     draw_line_h(x - 1, y - 2, 15);
     draw_line_h(x - 2, y - 1, 16);
     draw_line_h(x - 2, y + 24, 16);
@@ -83,8 +83,8 @@ static void draw_mods_square(uint8_t mod_state, int8_t enc_turn_state, bool show
     oled_set_cursor(cursor_x, cursor_y);
     draw_line_h(x, y - 1, 7);
     draw_line_h(x, y + 7, 7);
-    draw_line_v(x - 1, y, 7);
-    draw_line_v(x + 7, y, 7);
+    draw_line_v(x - 1, y, 7, true);
+    draw_line_v(x + 7, y, 7, true);
     if ((mod_state & MOD_MASK_SHIFT) || (mod_state & MOD_MASK_CTRL) || (mod_state & MOD_MASK_ALT) || (mod_state & MOD_MASK_GUI) || (enc_turn_state != 0 && show_enc_turn)) {
         draw_rectangle(x, y - 1, 7, 9, true);
         if (mod_state & MOD_MASK_SHIFT) {
@@ -112,8 +112,8 @@ static void draw_info_panel(led_t led_state, uint8_t layer_state, char* enc_mode
     oled_set_cursor(cursor_x, cursor_y);
     if (enc_press_state > 0) {
         draw_rectangle(x, y - 1, 19, 10, true);
-        draw_line_v(x - 1, y, 8);
-        draw_line_v(x + 19, y, 8);
+        draw_line_v(x - 1, y, 8, true);
+        draw_line_v(x + 19, y, 8, true);
         oled_write(enc_mode, true);
     } else {
         oled_write(enc_mode, false);
@@ -121,8 +121,8 @@ static void draw_info_panel(led_t led_state, uint8_t layer_state, char* enc_mode
     oled_advance_char();
     if (led_state.caps_lock) {
         draw_rectangle(x + 24, y - 1, 19 + long_caps_x_add, 10, true);
-        draw_line_v(x + 24 - 1, y, 8);
-        draw_line_v(x + 24 + 19 + long_caps_x_add, y, 8);
+        draw_line_v(x + 24 - 1, y, 8, true);
+        draw_line_v(x + 24 + 19 + long_caps_x_add, y, 8, true);
         oled_write_P(PSTR(is_long_caps ? "CAPS" : "CAP"), true);
     } else {
         oled_write_P(PSTR(is_long_caps ? "CAPS" : "CAP"), false);
@@ -130,8 +130,8 @@ static void draw_info_panel(led_t led_state, uint8_t layer_state, char* enc_mode
     oled_advance_char();
     if (biton32(layer_state) > 0) {
         draw_rectangle(x + 48 + long_caps_x_add, y - 1, 12, 10, true);
-        draw_line_v(x + 48 - 1 + long_caps_x_add, y, 8);
-        draw_line_v(x + 48 + 12 + long_caps_x_add, y, 8);
+        draw_line_v(x + 48 - 1 + long_caps_x_add, y, 8, true);
+        draw_line_v(x + 48 + 12 + long_caps_x_add, y, 8, true);
         oled_write_P(PSTR("L"), true);
         oled_write_char(get_highest_layer(layer_state) + 0x30, true);
     } else {

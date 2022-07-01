@@ -11,6 +11,7 @@ void draw_bongo_dynamic(void);
 void draw_luna(void);
 void draw_pusheen(void);
 void draw_kirby(void);
+void draw_pet_text(bool as_overlay);
 
 #define min(x, y) (((x) >= (y)) ? (y) : (x))
 #define max(x, y) (((x) >= (y)) ? (x) : (y))
@@ -126,20 +127,11 @@ void draw_current_pet(void) {
     switch (pet_mode) {
         default:
         case PET_LUNA:
-            if (!draw_gif_1()) {
-                draw_luna();
-            }
-            return;
+            return !draw_gif_1() ? draw_luna() : draw_pet_text(true);
         case PET_PUSHEEN:
-            if (!draw_gif_2()) {
-                draw_pusheen();
-            }
-            return;
+            return !draw_gif_2() ? draw_pusheen() : draw_pet_text(true);
         case PET_KIRBY:
-            if (!draw_gif_3()) {
-                draw_kirby();
-            }
-            return;
+            return !draw_gif_3() ? draw_kirby() : draw_pet_text(true);
     }
 }
 
@@ -341,47 +333,62 @@ static char* get_date(bool show_full) {
     return date_str;
 }
 
-void draw_pet_text_section(void) {
-    led_t led_state = host_keyboard_led_state();
-    switch (date_time_mode) {
-        default:
-        case 0:
-            oled_set_cursor(is_24hr_time() ? 16 : 14, 1);
-            oled_write(get_time(), false);
-            break;
-        case 1:
-            oled_set_cursor(13, 1);
-            oled_write(get_date(false), false);
-            break;
-        case 2:
-            switch (pet_mode) {
-                default:
-                case PET_LUNA:
-                    oled_set_cursor(17, 1);
-                    oled_write_P(PSTR("LUNA"), false);
-                    break;
-                case PET_PUSHEEN:
-                    oled_set_cursor(14, 1);
-                    oled_write_P(PSTR("PUSHEEN"), false);
-                    break;
-                case PET_KIRBY:
-                    oled_set_cursor(16, 1);
-                    oled_write_P(PSTR("KIRBY"), false);
-                    break;
-            }
-            break;
-    }
+void draw_pet_text(bool as_overlay) {
+    if (!as_overlay || (as_overlay && (get_mods() & MOD_MASK_CTRL))) {
+        led_t led_state = host_keyboard_led_state();
 
-    if (led_state.caps_lock) {
-        oled_set_cursor(12, 3);
-        oled_write_P(PSTR("CAPS"), false);
-    } else {
-        oled_set_cursor(13, 3);
-        oled_write(get_enc_mode(), false);
+        // BG box
+        if (as_overlay) {
+            draw_rectangle(74, 0, 58, 32, false);
+            draw_line_v(73, 2, 28, false);
+            draw_line_v(72, 4, 24, false);
+            draw_line_v(71, 6, 20, false);
+            draw_line_v(70, 8, 16, false);
+        }
+
+        switch (date_time_mode) {
+            default:
+            case 0:
+                oled_set_cursor(is_24hr_time() ? 16 : 14, 1);
+                oled_write(get_time(), false);
+                break;
+            case 1:
+                oled_set_cursor(13, 1);
+                oled_write(get_date(false), false);
+                break;
+            case 2:
+                if (as_overlay) {
+                    break;
+                }
+                switch (pet_mode) {
+                    default:
+                    case PET_LUNA:
+                        oled_set_cursor(17, 1);
+                        oled_write_P(PSTR("LUNA"), false);
+                        break;
+                    case PET_PUSHEEN:
+                        oled_set_cursor(14, 1);
+                        oled_write_P(PSTR("PUSHEEN"), false);
+                        break;
+                    case PET_KIRBY:
+                        oled_set_cursor(16, 1);
+                        oled_write_P(PSTR("KIRBY"), false);
+                        break;
+                }
+                break;
+        }
+
+        if (led_state.caps_lock) {
+            oled_set_cursor(12, 3);
+            oled_write_P(PSTR("CAPS"), false);
+        } else {
+            oled_set_cursor(13, 3);
+            oled_write(get_enc_mode(), false);
+        }
+        oled_write_P(PSTR("   L"), false);
+        draw_line_v(104, 24, 8, true);
+        oled_write_char(get_highest_layer(layer_state) + 0x30, false);
     }
-    oled_write_P(PSTR("   L"), false);
-    draw_line_v(104, 24, 8);
-    oled_write_char(get_highest_layer(layer_state) + 0x30, false);
 }
 
 // Custom matrix
@@ -433,17 +440,17 @@ void draw_matrix() {
     draw_line_h(MATRIX_DISPLAY_X + 1, MATRIX_DISPLAY_Y - 1 + (9 * MATRIX_SCALE), 19 * MATRIX_SCALE - 1);
     draw_line_h(MATRIX_DISPLAY_X + 2, MATRIX_DISPLAY_Y + (9 * MATRIX_SCALE), 19 * MATRIX_SCALE - 3);
     // left
-    draw_line_v(MATRIX_DISPLAY_X, MATRIX_DISPLAY_Y + 2, 9 * MATRIX_SCALE - 3);
-    draw_line_v(MATRIX_DISPLAY_X + 1, MATRIX_DISPLAY_Y + 2, 9 * MATRIX_SCALE - 2);
+    draw_line_v(MATRIX_DISPLAY_X, MATRIX_DISPLAY_Y + 2, 9 * MATRIX_SCALE - 3, true);
+    draw_line_v(MATRIX_DISPLAY_X + 1, MATRIX_DISPLAY_Y + 2, 9 * MATRIX_SCALE - 2, true);
     // right
-    draw_line_v(MATRIX_DISPLAY_X + (19 * MATRIX_SCALE), MATRIX_DISPLAY_Y + 2, 9 * MATRIX_SCALE - 3);
-    draw_line_v(MATRIX_DISPLAY_X - 1 + (19 * MATRIX_SCALE), MATRIX_DISPLAY_Y + 2, 9 * MATRIX_SCALE - 2);
+    draw_line_v(MATRIX_DISPLAY_X + (19 * MATRIX_SCALE), MATRIX_DISPLAY_Y + 2, 9 * MATRIX_SCALE - 3, true);
+    draw_line_v(MATRIX_DISPLAY_X - 1 + (19 * MATRIX_SCALE), MATRIX_DISPLAY_Y + 2, 9 * MATRIX_SCALE - 2, true);
 
     // encoder
     draw_rectangle(MATRIX_DISPLAY_X + 51, MATRIX_DISPLAY_Y + 8, 3, 4, true);
     draw_line_h(MATRIX_DISPLAY_X + 51, MATRIX_DISPLAY_Y + 12, 3);
-    draw_line_v(MATRIX_DISPLAY_X + 50, MATRIX_DISPLAY_Y + 9, 3);
-    draw_line_v(MATRIX_DISPLAY_X + 54, MATRIX_DISPLAY_Y + 9, 3);
+    draw_line_v(MATRIX_DISPLAY_X + 50, MATRIX_DISPLAY_Y + 9, 3, true);
+    draw_line_v(MATRIX_DISPLAY_X + 54, MATRIX_DISPLAY_Y + 9, 3, true);
 
     // oled location
     for (int i = -1; i < MATRIX_SCALE - 1; i++) {
@@ -567,7 +574,6 @@ void draw_bongo_dynamic() {
             break;
     }
 
-    // draw_rectangle(108, 6, 20, 11, false);
     if (biton32(layer_state) > 0) {
         oled_set_cursor(19, 2);
         oled_write_P(PSTR("L"), false);
@@ -624,7 +630,7 @@ void draw_luna() {
         animate_luna();
     }
 
-    draw_pet_text_section();
+    draw_pet_text(false);
 }
 
 void draw_pusheen() {
@@ -672,7 +678,7 @@ void draw_pusheen() {
         animate_pusheen();
     }
 
-    draw_pet_text_section();
+    draw_pet_text(false);
 }
 
 void draw_kirby() {
@@ -754,7 +760,7 @@ void draw_kirby() {
         }
     }
 
-    draw_pet_text_section();
+    draw_pet_text(false);
 }
 
 void draw_settings() {
