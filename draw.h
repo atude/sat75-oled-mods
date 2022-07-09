@@ -32,30 +32,29 @@ static void draw_rectangle(uint8_t x, uint8_t y, uint8_t x_len, uint8_t y_len, b
 static void draw_wpm_bar(uint8_t cursor_x, uint8_t wpm, char* date) {
     uint8_t x     = (cursor_x * 5) + cursor_x - 1;
     uint8_t y     = 5;
-    uint8_t y_len = min(wpm / 6, 22);
-    for (uint8_t i = 0; i < 13; i++) {
+    uint8_t y_len = min(wpm / 6, 24);
+    for (uint8_t i = 0; i < 2; i++) {
         for (uint8_t j = 0; j < y_len; j++) {
-            oled_write_pixel(i + x, 22 - j + y, true);
+            oled_write_pixel(i + x + 14, 23 - j + y, true);
+            oled_write_pixel(i + x - 3, 23 - j + y, true);
         }
     }
-    draw_line_v(x - 3, y, 24, true);
-    draw_line_v(x - 2, y - 1, 26, true);
-    draw_line_v(x + 14, y - 1, 26, true);
-    draw_line_v(x + 15, y, 24, true);
-    draw_line_h(x - 1, y - 2, 15);
-    draw_line_h(x - 2, y - 1, 16);
-    draw_line_h(x - 2, y + 24, 16);
-    draw_line_h(x - 1, y + 25, 15);
 
     // Embed date in wpm bar
-    if (wpm < 20) {
-        char date_first_section[3]  = {date[0], date[1], '\0'};
-        char date_second_section[3] = {date[3], date[4], '\0'};
-        oled_set_cursor(cursor_x, 1);
-        oled_write(date_first_section, false);
-        oled_set_cursor(cursor_x, 2);
-        oled_write(date_second_section, false);
+    char date_first_section[3]  = {date[0], date[1], '\0'};
+    char date_second_section[3] = {date[3], date[4], '\0'};
+    if (wpm > 145) {
+        draw_rectangle(x - 1, y, 15, 28, true);
     }
+    oled_set_cursor(cursor_x, 1);
+    oled_write(date_first_section, wpm > 145);
+    oled_set_cursor(cursor_x, 2);
+    oled_write(date_second_section, wpm > 145);
+
+    draw_line_h(x - 2, y - 2, 17);
+    draw_line_h(x - 3, y - 1, 19);
+    draw_line_h(x - 3, y + 24, 19);
+    draw_line_h(x - 2, y + 25, 17);
 }
 
 /**
