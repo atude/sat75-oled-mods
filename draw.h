@@ -1,22 +1,8 @@
 #include <stdio.h>
+#include "font.h"
 
 #define min(x, y) (((x) >= (y)) ? (y) : (x))
-
-static void l_a(uint8_t x, uint8_t y, bool on);
-static void l_m(uint8_t x, uint8_t y, bool on);
-static void l_p(uint8_t x, uint8_t y, bool on);
-static void l_p(uint8_t x, uint8_t y, bool on);
-static void n_colon(uint8_t x, uint8_t y, bool on);
-static void n_zero(uint8_t x, uint8_t y, bool on);
-static void n_one(uint8_t x, uint8_t y, bool on);
-static void n_two(uint8_t x, uint8_t y, bool on);
-static void n_three(uint8_t x, uint8_t y, bool on);
-static void n_four(uint8_t x, uint8_t y, bool on);
-static void n_five(uint8_t x, uint8_t y, bool on);
-static void n_six(uint8_t x, uint8_t y, bool on);
-static void n_seven(uint8_t x, uint8_t y, bool on);
-static void n_eight(uint8_t x, uint8_t y, bool on);
-static void n_nine(uint8_t x, uint8_t y, bool on);
+#define draw_pixel(x, y, on) oled_write_pixel(x, y, on)
 
 /**
  * Generic helpers
@@ -140,14 +126,22 @@ static void draw_info_panel(led_t led_state, uint8_t layer_state, char* enc_mode
     }
 }
 
+// Draw a set of pixels within defined bounds; pixels are defined as a 2D array of 0s and 1s
+static void draw_clock_digit(uint8_t x_start, uint8_t y_start, uint8_t pixels[CLOCK_FONT_ROWS][CLOCK_FONT_COLS]) {
+    for (uint8_t i = 0; i < CLOCK_FONT_COLS; i++) {
+        for (uint8_t j = 0; j < CLOCK_FONT_ROWS; j++) {
+            uint8_t x = i + x_start;
+            uint8_t y = j + y_start;
+            draw_pixel(x, y, pixels[j][i] == 1);
+        }
+    }
+}
+
 // Big clock
 static void draw_big_clock(uint16_t last_minute, uint8_t x, uint8_t y, bool is_24hr) {
     uint8_t  hour         = last_minute / 60;
-    uint8_t  hour_digit   = 0;
     uint16_t minute       = last_minute % 60;
-    uint16_t minute_digit = 0;
-    int8_t   digit_w      = 10;
-    int8_t   digit_h      = 14;
+    uint8_t  digit_w      = 10;
     bool     is_pm        = (hour / 12) > 0;
 
     if (!is_24hr) {
@@ -157,214 +151,17 @@ static void draw_big_clock(uint16_t last_minute, uint8_t x, uint8_t y, bool is_2
         }
     }
 
-    // Hour First Digit
-    if (hour < 10) {
-        n_zero(x, y, true);
-        hour_digit = hour;
-    } else if (hour < 20) {
-        n_one(x, y, true);
-        hour_digit = hour - 10;
-    } else if (hour < 24) {
-        n_two(x, y, true);
-        hour_digit = hour - 20;
-    } else if (hour == 24) {
-        n_zero(x, y, true);
-        n_zero(x + digit_w, y, true);
-    }
-    // Hour Second Digit
-    if (hour_digit == 1) {
-        n_one(x + digit_w, y, true);
-    } else if (hour_digit == 2) {
-        n_two(x + digit_w, y, true);
-    } else if (hour_digit == 3) {
-        n_three(x + digit_w, y, true);
-    } else if (hour_digit == 4) {
-        n_four(x + digit_w, y, true);
-    } else if (hour_digit == 5) {
-        n_five(x + digit_w, y, true);
-    } else if (hour_digit == 6) {
-        n_six(x + digit_w, y, true);
-    } else if (hour_digit == 7) {
-        n_seven(x + digit_w, y, true);
-    } else if (hour_digit == 8) {
-        n_eight(x + digit_w, y, true);
-    } else if (hour_digit == 9) {
-        n_nine(x + digit_w, y, true);
-    } else if (hour_digit == 0) {
-        n_zero(x + digit_w, y, true);
-    }
-    // Colon
-    n_colon(x + digit_w * 2, y, true);
-    // Minute First Digit
-    if (minute < 10) {
-        n_zero(x + digit_w * 3, y, true);
-        minute_digit = minute;
-    } else if (minute < 20) {
-        n_one(x + digit_w * 3, y, true);
-        minute_digit = minute - 10;
-    } else if (minute < 30) {
-        n_two(x + digit_w * 3, y, true);
-        minute_digit = minute - 20;
-    } else if (minute < 30) {
-        n_two(x + digit_w * 3, y, true);
-        minute_digit = minute - 20;
-    } else if (minute < 40) {
-        n_three(x + digit_w * 3, y, true);
-        minute_digit = minute - 30;
-    } else if (minute < 50) {
-        n_four(x + digit_w * 3, y, true);
-        minute_digit = minute - 40;
-    } else if (minute < 50) {
-        n_four(x + digit_w * 3, y, true);
-        minute_digit = minute - 40;
-    } else if (minute < 60) {
-        n_five(x + digit_w * 3, y, true);
-        minute_digit = minute - 50;
-    } else if (minute == 60) {
-        n_zero(x + digit_w * 3, y, true);
-    }
-    // Minute Second Digit
-    if (minute % 10 == 0) {
-        n_zero(x + digit_w * 4, y, true);
-    } else if (minute_digit == 1) {
-        n_one(x + digit_w * 4, y, true);
-    } else if (minute_digit == 2) {
-        n_two(x + digit_w * 4, y, true);
-    } else if (minute_digit == 3) {
-        n_three(x + digit_w * 4, y, true);
-    } else if (minute_digit == 4) {
-        n_four(x + digit_w * 4, y, true);
-    } else if (minute_digit == 5) {
-        n_five(x + digit_w * 4, y, true);
-    } else if (minute_digit == 6) {
-        n_six(x + digit_w * 4, y, true);
-    } else if (minute_digit == 7) {
-        n_seven(x + digit_w * 4, y, true);
-    } else if (minute_digit == 8) {
-        n_eight(x + digit_w * 4, y, true);
-    } else if (minute_digit == 9) {
-        n_nine(x + digit_w * 4, y, true);
-    }
-
-    int8_t l_w = 12;
-    int8_t l_h = 10;
+    // hh
+    draw_clock_digit(x, y, clock_font[(int)(hour / 10)]);
+    draw_clock_digit(x + digit_w, y, hour == 24 ? clock_font[0] : clock_font[hour % 10]);
+    // colon
+    draw_clock_digit(x + digit_w * 2, y, clock_font[13]);
+    // // mm
+    draw_clock_digit(x + digit_w * 3, y, minute == 60 ? clock_font[0] : clock_font[(int)(minute / 10)]);
+    draw_clock_digit(x + digit_w * 4, y, clock_font[minute % 10]);
 
     if (!is_24hr) {
-        if (is_pm) {
-            l_p(x + digit_w * 5 + 4, y + digit_h - l_h, true);
-            l_m(x + digit_w * 5 + 4 + l_w, y + digit_h - l_h, true);
-        } else {
-            l_a(x + digit_w * 5 + 4, y + digit_h - l_h, true);
-            l_m(x + digit_w * 5 + 4 + l_w, y + digit_h - l_h, true);
-        }
+        draw_clock_digit(x + digit_w * 5, y, clock_font[is_pm ? 11 : 10]);
+        draw_clock_digit(x + digit_w * 6, y, clock_font[12]);
     }
-}
-
-/**
- * Big clock helpers
- */
-static void l_a(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x, y + 2, 2, 8, on);
-    draw_rectangle(x + 8, y + 2, 2, 8, on);
-    draw_rectangle(x + 2, y, 6, 2, on);
-    draw_rectangle(x + 2, y + 6, 6, 2, on);
-}
-
-static void l_m(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x, y, 2, 10, on);
-    draw_rectangle(x + 8, y, 2, 10, on);
-    draw_rectangle(x + 2, y + 2, 2, 2, on);
-    draw_rectangle(x + 6, y + 2, 2, 2, on);
-    draw_rectangle(x + 4, y + 4, 2, 2, on);
-}
-
-static void l_p(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x, y, 2, 10, on);
-    draw_rectangle(x + 2, y, 6, 2, on);
-    draw_rectangle(x + 2, y + 6, 6, 2, on);
-    draw_rectangle(x + 8, y + 2, 2, 4, on);
-}
-
-static void n_colon(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x + 3, y + 3, 2, 2, on);
-    draw_rectangle(x + 3, y + 9, 2, 2, on);
-}
-
-static void n_zero(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x + 2, y, 4, 14, on);
-    draw_rectangle(x, y + 2, 8, 10, on);
-    draw_rectangle(x + 2, y + 2, 4, 10, !on);
-}
-
-static void n_one(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x + 4, y, 2, 12, on);
-    draw_rectangle(x + 2, y + 2, 2, 2, on);
-    draw_rectangle(x + 2, y + 12, 6, 2, on);
-}
-
-static void n_two(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x + 2, y, 4, 2, on);
-    draw_rectangle(x, y + 2, 2, 2, on);
-    draw_rectangle(x + 6, y + 2, 2, 4, on);
-    draw_rectangle(x + 4, y + 6, 2, 2, on);
-    draw_rectangle(x + 2, y + 8, 2, 2, on);
-    draw_rectangle(x, y + 10, 2, 2, on);
-    draw_rectangle(x, y + 12, 8, 2, on);
-}
-
-static void n_three(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x + 2, y, 4, 2, on);
-    draw_rectangle(x, y + 2, 2, 2, on);
-    draw_rectangle(x + 6, y + 2, 2, 4, on);
-    draw_rectangle(x + 2, y + 6, 4, 2, on);
-    draw_rectangle(x + 6, y + 8, 2, 4, on);
-    draw_rectangle(x, y + 10, 2, 2, on);
-    draw_rectangle(x + 2, y + 12, 4, 2, on);
-}
-
-static void n_four(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x, y, 2, 6, on);
-    draw_rectangle(x + 2, y + 6, 4, 2, on);
-    draw_rectangle(x + 6, y, 2, 14, on);
-}
-
-static void n_five(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x, y, 8, 2, on);
-    draw_rectangle(x, y + 2, 2, 2, on);
-    draw_rectangle(x, y + 4, 6, 2, on);
-    draw_rectangle(x + 6, y + 6, 2, 6, on);
-    draw_rectangle(x, y + 10, 2, 2, on);
-    draw_rectangle(x + 2, y + 12, 4, 2, on);
-}
-
-static void n_six(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x + 2, y, 4, 2, on);
-    draw_rectangle(x + 6, y + 2, 2, 2, on);
-    draw_rectangle(x, y + 2, 2, 10, on);
-    draw_rectangle(x + 2, y + 6, 4, 2, on);
-    draw_rectangle(x + 6, y + 8, 2, 4, on);
-    draw_rectangle(x + 2, y + 12, 4, 2, on);
-}
-
-static void n_seven(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x, y, 8, 2, on);
-    draw_rectangle(x + 6, y + 2, 2, 4, on);
-    draw_rectangle(x + 4, y + 6, 2, 4, on);
-    draw_rectangle(x + 2, y + 10, 2, 4, on);
-}
-
-static void n_eight(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x + 2, y, 4, 14, on);
-    draw_rectangle(x, y + 2, 8, 4, on);
-    draw_rectangle(x, y + 8, 8, 4, on);
-    draw_rectangle(x + 2, y + 2, 4, 4, !on);
-    draw_rectangle(x + 2, y + 8, 4, 4, !on);
-}
-
-static void n_nine(uint8_t x, uint8_t y, bool on) {
-    draw_rectangle(x + 2, y, 4, 14, on);
-    draw_rectangle(x, y + 2, 8, 10, on);
-    draw_rectangle(x + 2, y + 2, 4, 4, !on);
-    draw_rectangle(x, y + 6, 2, 4, !on);
-    draw_rectangle(x + 2, y + 8, 4, 4, !on);
 }
