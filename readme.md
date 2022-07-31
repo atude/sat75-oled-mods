@@ -1,3 +1,5 @@
+## [MOVED: MODS ARE NOW DONE IN ATYU](https://github.com/atude/atyu-app)
+
 ![](https://raw.githubusercontent.com/atude/sat75-oled-mods/main/banner.png)
 
 # Satisfaction 75 OLED mods
