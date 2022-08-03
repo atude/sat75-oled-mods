@@ -1,4 +1,4 @@
-## [MOVED: MODS ARE NOW DONE IN ATYU](https://github.com/atude/atyu-app)
+## [(08/22) MOVED: MODS ARE NOW DONE IN THE ATYU APP AND ATYU QMK REPO. THIS REPO WILL NOT RECEIVE UPDATES.](https://github.com/atude/atyu-app)
 
 ![](https://raw.githubusercontent.com/atude/sat75-oled-mods/main/banner.png)
 
